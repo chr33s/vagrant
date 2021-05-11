@@ -1,0 +1,76 @@
+{
+  "builders": [
+    {
+      "boot_command": [
+        "root<enter><wait>",
+        "ifconfig eth0 up && udhcpc -i eth0<enter><wait5>",
+        "wget http://{{ .HTTPIP }}:{{ .HTTPPort }}/answers<enter><wait>",
+        "setup-alpine -f answers<enter><wait10>",
+        "{{user `root_password`}}<enter><wait>",
+        "{{user `root_password`}}<enter><wait20s>",
+        "y<enter><wait120s>",
+        "reboot<enter><wait120s>",
+        "root<enter><wait>",
+        "{{user `root_password`}}<enter><wait>",
+        "echo http://dl-cdn.alpinelinux.org/alpine/v3.13/community >> /etc/apk/repositories<enter>",
+        "apk update<enter><wait15s>",
+        "apk add sudo<enter><wait15s>",
+        "echo '%wheel ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/wheel<enter>",
+        "adduser {{user `ssh_username`}}<enter>",
+        "{{user `ssh_password`}}<enter>",
+        "{{user `ssh_password`}}<enter>",
+        "adduser {{user `ssh_username`}} wheel<enter>",
+        "cd ~{{user `ssh_username`}}<enter>",
+        "mkdir .ssh<enter>",
+        "chmod 700 .ssh<enter>",
+        "echo '{{user `ssh_key`}}' > .ssh/authorized_keys<enter>",
+        "chown -R {{user `ssh_username`}} .ssh<enter>",
+        "sed -i 's/^#PermitRootLogin .*/PermitRootLogin yes/g' /etc/ssh/sshd_config<enter>",
+        "service sshd restart<enter>",
+        "exit<enter>"
+      ],
+      "boot_wait": "15s",
+      "cpus": "{{user `cpus`}}",
+      "communicator": "ssh",
+      "disk_size": "{{user `disk_size`}}",
+      "guest_os_type": "other",
+      "hard_drive_interface": "sata",
+      "http_directory": "http",
+      "iso_checksum": "{{user `iso_checksum_type`}}:{{user `iso_checksum`}}",
+      "iso_url": "{{user `iso_url`}}",
+      "memory": "{{user `memory`}}",
+      "output_directory": "output-{{user `vm_name`}}-{{build_type}}",
+      "parallels_tools_flavor": "lin",
+      "parallels_tools_mode": "disable",
+      "shutdown_command": "echo {{user `ssh_password`}} | sudo -S /sbin/poweroff",
+      "ssh_password": "{{user `ssh_password`}}",
+      "ssh_timeout": "{{user `ssh_timeout`}}",
+      "ssh_username": "{{user `ssh_username`}}",
+      "type": "parallels-iso",
+      "vm_name": "packer-{{user `vm_name`}}"
+    }
+  ],
+  "post-processors": [
+    {
+      "compression_level": "{{user `compression_level`}}",
+      "output": "{{user `vm_name`}}-{{.Provider}}.box",
+      "type": "vagrant"
+    }
+  ],
+  "provisioners": [],
+  "variables": {
+    "compression_level": "9",
+    "cpus": "1",
+    "disk_size": "10240",
+    "iso_checksum": "9b9ac85a371e93f4c3f3873c4e2c85693dd427f75e6f2bf78d74f2088370f9d5",
+    "iso_checksum_type": "sha256",
+    "iso_url": "http://dl-cdn.alpinelinux.org/alpine/v3.13/releases/aarch64/alpine-standard-3.13.5-aarch64.iso",
+    "memory": "1024",
+    "ssh_key": "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key",
+    "ssh_password": "vagrant",
+    "ssh_timeout": "10m",
+    "ssh_username": "vagrant",
+    "root_password": "vagrant",
+    "vm_name": "alpine.3.13.5-aarch64"
+  }
+}

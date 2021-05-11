@@ -1,0 +1,14 @@
+APKREPOSOPTS="-1"
+DISKOPTS="-m sys /dev/sda"
+HOSTNAMEOPTS="-n alpine"
+INTERFACESOPTS="auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet dhcp
+"
+KEYMAPOPTS="us us"
+NTPOPTS="-c chrony"
+PROXYOPTS="none"
+SSHDOPTS="-c openssh"
+TIMEZONEOPTS="-z UTC"
